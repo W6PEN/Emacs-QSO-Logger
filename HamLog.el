@@ -18,7 +18,7 @@
         (comment (read-string "Comment: ")))
     (with-temp-buffer
       (insert (format "Callsign: %s\nMode: %s\nFrequency: %s\nDate: %s\nTime: %s\nRST Rec'd: %s\nRST Sent: %s\nOperator: %s\nLocation: %s\nComment: %s\n"
-                      callsign mode frequency date time rstrcvd rstsent operator location))
+                      callsign mode frequency date time rstrcvd rstsent operator location comment))
       (append-to-file (point-min) (point-max) "~/radio-log.txt"))))
 
 ;; Define a function to export the logbook to ADIF format
