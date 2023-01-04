@@ -10,8 +10,6 @@
   (let ((callsign (read-string "Callsign: "))
         (mode (read-string "Mode: "))
         (frequency (read-string "Frequency: "))
-;;        (date (read-string "UTC Date (YYYYMMDD): "))
-;;        (time (read-string "UTC Time (HHMM): "))
         (rstrcvd (read-string "RST Rcvd: "))
         (rstsent (read-string "RST Sent: "))
         (operator (read-string "Operator: "))
@@ -22,7 +20,7 @@
                       callsign mode frequency date time rstrcvd rstsent operator location comment))
       (append-to-file (point-min) (point-max) "~/radio-log.txt")))
     (with-temp-buffer    
-      (insert (format "<CALL:%d>%s <MODE:%d>%s <FREQ:%d>%s <QSO_DATE:%d>%s <TIME_ON:%d>%s <RST_RCVD:%d>%s <RST_SENT:%d>%s <NAME:%d>%s <QTH:%d>%s<COMMENT:%d>%s\n"
+      (insert (format "<CALL:%d>%s <MODE:%d>%s <FREQ:%d>%s <QSO_DATE:%d>%s <TIME_ON:%d>%s <RST_RCVD:%d>%s <RST_SENT:%d>%s <NAME:%d>%s <QTH:%d>%s <COMMENT:%d>%s\n"
                         (length callsign) callsign
                         (length mode) mode
                         (length frequency) frequency
@@ -33,5 +31,4 @@
                         (length operator) operator
                         (length location) location
                         (length comment) comment))
-        (forward-line))
-      (append-to-file (point-min) (point-max) "~/radio-logbook.adi")))
+      (append-to-file (point-min) (point-max) "~/radio-logbook.adi"))))
