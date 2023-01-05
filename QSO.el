@@ -84,16 +84,16 @@
             (operator (progn (search-forward "Operator: ") (thing-at-point 'word)))
             (location (progn (search-forward "Location: ") (thing-at-point 'word))))
             (comment (progn (search-forward "Comment: ") (thing-at-point 'word))))
-        (insert (format "<CALL:%d>%s <MODE:%d>%s <FREQ:%d>%s <QSO_DATE:%d>%s <TIME_ON:%d>%s <RST_RCVD:%d>%s <RST_SENT:%d>%s <NAME:%d>%s <QTH:%d>%s<COMMENT:%d>%s\n"
+        (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
                         (length callsign) callsign
-                        (length mode) mode
-                        (length frequency) frequency
                         (length date) date
                         (length time) time
-                        (length rstrcvd) rstrcvd
+                        (length mode) mode
+                        (length frequency) frequency
                         (length rstsent) rstsent
+                        (length rstrcvd) rstrcvd
                         (length operator) operator
                         (length location) location
                         (length comment) comment))
         (forward-line))
-(write-file "~/qso-log-export.adi")))
+    (write-file "~/qso-log-export.adi")))
