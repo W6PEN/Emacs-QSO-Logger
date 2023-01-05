@@ -12,8 +12,8 @@
         (time (format-time-string "%H%M%S" (current-time) t))
         (rstrcvd (read-string "RST Rcvd: "))
         (rstsent (read-string "RST Sent: "))
-        (operator (read-string "Operator: "))
         (location (read-string "Location: "))
+        (operator (read-string "Operator: "))
         (comment (read-string "Comment: ")))
     (with-temp-buffer
       (insert (format "Callsign: %s\nDate: %s\nTime: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
@@ -44,8 +44,8 @@
                      (time (format-time-string "%H%M%S" (current-time) t))
                      (rstsent (read-string "RST Sent: "))
                      (rstrcvd (read-string "RST Rcvd: "))
-                     (operator (read-string "Operator: "))
                      (location (read-string "Location: "))
+                     (operator (read-string "Operator: "))
                      (comment (read-string "Comment: ")))
                (with-temp-buffer
                  (insert (format "Callsign: %s\nDate: %s\nTime: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
