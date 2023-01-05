@@ -1,10 +1,10 @@
 ;; This code defines basic functions to capture and process new amateur radio contacts (QSOs). Two functions, each optimized to different use cases but still functional for most uses, capture and append new QSOs to a text file called `qso-log.txt` and an ADIF file `qso-log.adi` in the user's home directory. 
 ;; The `add-qso` function is optimized for use when responding to a CQ. The `add-qso-cq` function is optimized for use when calling CQ and expecting more than one response, so the mode and frequency are entered only once per session, and C-g exits the loop.
 ;; A third function, `export-adif`, is provided to allow for a wholesale export of the `qso-log.txt` to a different ADIF file. 
-;; The ADIF file can then be imported into another logging program or platform that supports the ADIF format for further processing or archiving.
+;; The ADIF file can then be further processed in Emacs (e.g. adding an ADIF header) or imported into an external logging program or database that supports the ADIF format.
 
 (defun add-qso ()
-  "Prompt the user for information about a new amateur radio contact and add it to the logbook."
+  "Prompt the user for information about a new amateur radio contact (QSO) and append it to the txt and ADIF logbooks."
   (interactive)
   (let ((frequency (read-string "Frequency (MHz): "))
         (mode (read-string "Mode: "))
@@ -35,7 +35,7 @@
       (append-to-file (point-min) (point-max) "~/qso-log.adi"))))
 
 (defun add-qso-cq ()
-  "Prompt the user for information about amateur radio contacts responding to your CQ and add them to the logbook."
+  "Prompt the user for information about amateur radio contacts responding to your CQ and add them to the txt and ADIF logbooks."
   (interactive)
   (let ((frequency (read-string "Frequency (MHz): "))
         (mode (read-string "Mode: "))
@@ -68,7 +68,7 @@
 
 ;; Define a function to export the entire txt QSO logbook to a new file in ADIF format
 (defun export-adif ()
-  "Export the QSO logbook to a file in ADIF format."
+  "Export the entire QSO txt logbook to a new file in ADIF format."
   (interactive)
   (with-temp-buffer
     (insert-file-contents "~/qso-log.txt")
