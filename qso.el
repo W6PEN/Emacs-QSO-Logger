@@ -1,8 +1,8 @@
 ;;; qso.el --- A basic QSO logger for amateur radio operators        -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023  David Pentrack
+;; Copyright (C) 2023  
 
-;; Author: David Pentrack
+;; Author: W6PEN
 ;; Keywords: lisp
 ;; Version: 0.6.2
 
