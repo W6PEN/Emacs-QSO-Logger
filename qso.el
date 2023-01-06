@@ -1,7 +1,34 @@
-;; This code defines basic functions to capture and process new amateur radio contacts (QSOs). Two functions, each optimized to different use cases but still functional for most uses, capture and append new QSOs to a text file called `qso-log.txt` and an ADIF file `qso-log.adi` in the user's home directory. 
+;;; qso.el --- a simple QSO logger for amateur radio operators        -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2023  David Pentrack
+
+;; Author: David Pentrack
+;; Keywords: lisp
+;; Version: 0.5.0
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; This provides basic functions to capture and log new amateur radio contacts (QSOs) in real time. 
+;; Two functions, each optimized to different use cases but still functional for most uses, requests basic QSO data via the minibuffer and appends that information to a text file called `qso-log.txt` and to an ADIF file `qso-log.adi` in the user's home directory. 
+;; These QSOs will be automatically timestamped in UTC using the system clock.
 ;; The `add-qso` function is optimized for use when responding to a CQ. The `add-qso-cq` function is optimized for use when calling CQ and expecting more than one response, so the mode and frequency are entered only once per session, and C-g exits the loop.
-;; A third function, `export-adif`, is provided to allow for a wholesale export of the `qso-log.txt` to a different ADIF file. 
-;; The ADIF file can then be further processed in Emacs (e.g. adding an ADIF header) or imported into an external logging program or database that supports the ADIF format.
+;; A third function, `export-qso-adif`, is provided to allow for a wholesale export of the `qso-log.txt` file to an ADIF file `qso-log-export.adi` in the user's home directory.
+;; ADIF files can then be further processed in Emacs or imported into an external logging program or database that supports the ADIF format.
+
+;;; Code:
 
 (defun add-qso ()
   "Prompt the user for information about a new amateur radio contact (QSO) and append it to the txt and ADIF logbooks."
@@ -66,8 +93,7 @@
                         (length comment) comment))
                  (append-to-file (point-min) (point-max) "~/qso-log.adi")))))))
 
-;; Define a function to export the entire txt QSO logbook to a new file in ADIF format
-(defun export-adif ()
+(defun export-qso-adif ()
   "Export the entire QSO txt logbook to a new file in ADIF format."
   (interactive)
   (with-temp-buffer
@@ -97,3 +123,6 @@
                         (length comment) comment))
         (forward-line))
     (write-file "~/qso-log-export.adi")))
+
+(provide 'qso)
+;;; qso.el ends here
