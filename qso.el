@@ -21,9 +21,9 @@
 
 ;;; Commentary:
 
-;; This provides basic functions to capture and log new amateur radio contacts (QSOs) in real time. 
-;; Two functions, each optimized to different use cases but still functional for most uses, requests basic QSO data via the minibuffer and appends that information to a text file called `qso-log.txt` and to an ADIF file `qso-log.adi` in the user's home directory. 
-;; These QSOs will be automatically timestamped in UTC using the system clock.
+;; This provides basic functions to capture and log new amateur radio contacts (QSOs). 
+;; Two functions, each optimized to different use cases but still functional for most real time uses, requests basic QSO data via the minibuffer and appends that information to a text file called `qso-log.txt` and to an ADIF file `qso-log.adi` in the user's home directory. 
+;; These two functions automatically enter the date and time of the QSO in UTC by taking the current-time immediately after entering the callsign.
 ;; The `add-qso` function is optimized for use when responding to a CQ. The `add-qso-cq` function is optimized for use when calling CQ and expecting more than one response, so the mode and frequency are entered only once per session, and C-g exits the loop.
 ;; A third function, `export-qso-adif`, is provided to allow for a wholesale export of the `qso-log.txt` file to an ADIF file `qso-log-export.adi` in the user's home directory.
 ;; ADIF files can then be further processed in Emacs or imported into an external logging program or database that supports the ADIF format.
