@@ -1,4 +1,4 @@
-;;; qso.el --- a simple QSO logger for amateur radio operators        -*- lexical-binding: t; -*-
+;;; qso.el --- A basic QSO logger for amateur radio operators        -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2023  David Pentrack
 
@@ -21,14 +21,14 @@
 
 ;;; Commentary:
 
-;; This provides basic functions to capture and log new amateur radio contacts (QSOs). 
+;; This provides basic functions to capture and log new amateur radio contacts (QSOs). It captures data for Frequency, Mode, Callsign, RST Sent, RST Received, QTH, Operator, and Comment
 ;; Two real time QSO recording functions, `qso-add` and `qso-add-multi`, are optimized to different use cases but are still functional for most real time uses. These functions request basic QSO data via the minibuffer and appends that information to a text file called `qso-log.txt` and to an ADIF file `qso-log.adi` in the user's home directory. 
 ;; They automatically enter the date and time of the QSO in UTC by taking the current-time immediately after entering the callsign.
-;; `qso-add` is optimized for use when responding to a CQ: Frequency, Mode, Callsign, RST Received, RST Sent, Location, Operator, and Comment, in that order.
+;; `qso-add` is optimized for use when responding to a CQ, requesting Frequency, Mode, Callsign, RST Received, RST Sent, QTH, Operator, and Comment, in that order.
 ;; `qso-add-previous` performs the same function as `qso-add` except the date and time of the QSO is entered manually. 
 ;; `qso-add-multi` is a loop optimized for use when calling CQ and expecting more than one response, so the mode and frequency are entered only once per session, and RST Sent is requested prior to RST Received. C-g exits the loop.
 ;; `qso-add-multi-previous` performs the same function as `qso-add-multi` except the date and time for each QSO is entered manually.
-;; `qso-export-adif`, is provided to allow for a wholesale export of the `qso-log.txt` file to an ADIF file `qso-log-export.adi` in the user's home directory.
+;; `qso-export-adif` exports the entire contents of `qso-log.txt` to an ADIF file `qso-log-export.adi` in the user's home directory.
 ;; ADIF files can then be further processed in Emacs or imported into an external logging program or database that supports the ADIF format.
 
 ;;; Code:
