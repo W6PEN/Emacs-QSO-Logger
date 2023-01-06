@@ -4,7 +4,7 @@
 
 ;; Author: David Pentrack
 ;; Keywords: lisp
-;; Version: 0.6.1
+;; Version: 0.6.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -174,7 +174,7 @@
             (rstsent (progn (search-forward "RST Sent: ") (thing-at-point 'word)))
             (rstrcvd (progn (search-forward "RST Rcvd: ") (thing-at-point 'word)))
             (operator (progn (search-forward "Operator: ") (thing-at-point 'word)))
-            (location (progn (search-forward "Location: ") (thing-at-point 'word))))
+            (location (progn (search-forward "Location: ") (thing-at-point 'word)))
             (comment (progn (search-forward "Comment: ") (thing-at-point 'word))))
         (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
                         (length callsign) callsign
@@ -187,8 +187,8 @@
                         (length operator) operator
                         (length location) location
                         (length comment) comment))
-        (forward-line))
-    (write-file "~/qso-log-export.adi")))
+        (forward-line)))
+    (write-file "~/qso-log-export.adi"))))
 
 (provide 'qso)
 ;;; qso.el ends here
