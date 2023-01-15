@@ -4,7 +4,7 @@
 
 ;; Author: W6PEN
 ;; Keywords: lisp
-;; Version: 0.7.1
+;; Version: 0.7.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -149,7 +149,7 @@
 		(operator (read-string "Operator: "))
 		(comment (read-string "Comment: ")))
 	    (with-temp-buffer
-	      (insert (format "Callsign: %s\nDate: %s\nTime On: %s\nMTime Off: %s\node: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
+	      (insert (format "Callsign: %s\nDate: %s\nTime On: %s\nTime Off: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
 			      callsign date time timeoff mode frequency rstsent rstrcvd operator location comment))
 	      (append-to-file (point-min) (point-max) "~/qso-log.txt"))
 	    (with-temp-buffer    
