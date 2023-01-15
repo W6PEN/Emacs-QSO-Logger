@@ -4,7 +4,7 @@
 
 ;; Author: W6PEN
 ;; Keywords: lisp
-;; Version: 0.7.0
+;; Version: 0.7.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -40,21 +40,23 @@
         (mode (read-string "Mode: "))
         (callsign (read-string "Callsign: "))
         (date (format-time-string "%Y%m%d" (current-time) t))
-        (time (format-time-string "%H%M%S" (current-time) t))
+        (time (format-time-string "%H%M" (current-time) t))
         (rstrcvd (read-string "RST Rcvd: "))
         (rstsent (read-string "RST Sent: "))
         (location (read-string "Location: "))
         (operator (read-string "Operator: "))
         (comment (read-string "Comment: ")))
+        (timeoff (format-time-string "%H%M" (current-time) t))
     (with-temp-buffer
-      (insert (format "Callsign: %s\nDate: %s\nTime: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
-                      callsign date time mode frequency rstsent rstrcvd operator location comment))
+      (insert (format "Callsign: %s\nDate: %s\nTime On: %s\nTime Off: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
+                      callsign date time timeoff mode frequency rstsent rstrcvd operator location comment))
       (append-to-file (point-min) (point-max) "~/qso-log.txt"))
     (with-temp-buffer    
-      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
+      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<TIME_OFF:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
                         (length callsign) callsign
                         (length date) date
                         (length time) time
+                        (length timeoff) timeoff
                         (length mode) mode
                         (length frequency) frequency
                         (length rstsent) rstsent
@@ -71,22 +73,24 @@
         (mode (read-string "Mode: "))
         (callsign (read-string "Callsign: "))
         (date (read-string "QSO UTC Date (YYYYMMDD): "))
-        (time (read-string "QSO UTC Time (HHMMSS): "))
+        (time (read-string "QSO UTC Time On (HHMM): "))
+        (timeoff (read-string "QSO UTC Time Off (HHMM): "))
         (rstrcvd (read-string "RST Rcvd: "))
         (rstsent (read-string "RST Sent: "))
         (location (read-string "Location: "))
         (operator (read-string "Operator: "))
         (comment (read-string "Comment: ")))
     (with-temp-buffer
-      (insert (format "Callsign: %s\nDate: %s\nTime: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
-                      callsign date time mode frequency rstsent rstrcvd operator location comment))
+      (insert (format "Callsign: %s\nDate: %s\nTime On: %s\nTime Off: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
+                      callsign date time timeoff mode frequency rstsent rstrcvd operator location comment))
       (append-to-file (point-min) (point-max) "~/qso-log.txt"))
     (with-temp-buffer    
-      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
+      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<TIME_OFF:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
                         (length callsign) callsign
                         (length date) date
                         (length time) time
-                        (length mode) mode
+                        (length timeoff) timeoff
+		        (length mode) mode
                         (length frequency) frequency
                         (length rstsent) rstsent
                         (length rstrcvd) rstrcvd
@@ -103,21 +107,23 @@
 	(while (eq 1 1)
 	  (let ((callsign (read-string "Callsign: "))
 		(date (format-time-string "%Y%m%d" (current-time) t))
-		(time (format-time-string "%H%M%S" (current-time) t))
+		(time (format-time-string "%H%M" (current-time) t))
 		(rstsent (read-string "RST Sent: "))
 		(rstrcvd (read-string "RST Rcvd: "))
 		(location (read-string "Location: "))
 		(operator (read-string "Operator: "))
 		(comment (read-string "Comment: ")))
+		(timeoff (format-time-string "%H%M" (current-time) t))
 	    (with-temp-buffer
-	      (insert (format "Callsign: %s\nDate: %s\nTime: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
-			      callsign date time mode frequency rstsent rstrcvd operator location comment))
+	      (insert (format "Callsign: %s\nDate: %s\nTime On: %s\nTime Off: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
+			      callsign date time timeoff mode frequency rstsent rstrcvd operator location comment))
 	      (append-to-file (point-min) (point-max) "~/qso-log.txt"))
 	    (with-temp-buffer    
 	      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
 			      (length callsign) callsign
 			      (length date) date
 			      (length time) time
+			      (length timeoff) timeoff
 			      (length mode) mode
 			      (length frequency) frequency
 			      (length rstsent) rstsent
@@ -135,21 +141,23 @@
 	(while (eq 1 1)
 	  (let ((callsign (read-string "Callsign: "))
 		(date (read-string "QSO UTC Date (YYYYMMDD): "))
-		(time (read-string "QSO UTC Time (HHMMSS): "))
+		(time (read-string "QSO UTC Time On (HHMM): "))
+	        (timeoff (read-string "QSO UTC Time Off (HHMM): "))
 		(rstsent (read-string "RST Sent: "))
 		(rstrcvd (read-string "RST Rcvd: "))
 		(location (read-string "Location: "))
 		(operator (read-string "Operator: "))
 		(comment (read-string "Comment: ")))
 	    (with-temp-buffer
-	      (insert (format "Callsign: %s\nDate: %s\nTime: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
-			      callsign date time mode frequency rstsent rstrcvd operator location comment))
+	      (insert (format "Callsign: %s\nDate: %s\nTime On: %s\nMTime Off: %s\node: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
+			      callsign date time timeoff mode frequency rstsent rstrcvd operator location comment))
 	      (append-to-file (point-min) (point-max) "~/qso-log.txt"))
 	    (with-temp-buffer    
-	      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
+	      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<TIME_OFF:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
 			      (length callsign) callsign
 			      (length date) date
 			      (length time) time
+			      (length timeoff) timeoff
 			      (length mode) mode
 			      (length frequency) frequency
 			      (length rstsent) rstsent
@@ -158,37 +166,6 @@
 			      (length location) location
 			      (length comment) comment))
 	      (append-to-file (point-min) (point-max) "~/qso-log.adi"))))))
-
-(defun qso-export-adif ()
-  "Export the entire contents of the `qso-log.txt` in the user's home directory to an ADIF format file, `qso-log-export.adi`."
-  (interactive)
-  (with-temp-buffer
-    (insert-file-contents "~/qso-log.txt")
-    (goto-char (point-min))
-    (while (not (eobp))
-      (let ((callsign (progn (search-forward "Callsign: ") (thing-at-point 'word)))
-            (mode (progn (search-forward "Mode: ") (thing-at-point 'word)))
-            (frequency (progn (search-forward "Frequency: ") (thing-at-point 'word)))
-            (date (progn (search-forward "Date: ") (thing-at-point 'word)))
-            (time (progn (search-forward "Time: ") (thing-at-point 'word)))
-            (rstsent (progn (search-forward "RST Sent: ") (thing-at-point 'word)))
-            (rstrcvd (progn (search-forward "RST Rcvd: ") (thing-at-point 'word)))
-            (operator (progn (search-forward "Operator: ") (thing-at-point 'word)))
-            (location (progn (search-forward "Location: ") (thing-at-point 'word)))
-            (comment (progn (search-forward "Comment: ") (thing-at-point 'word))))
-        (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
-                        (length callsign) callsign
-                        (length date) date
-                        (length time) time
-                        (length mode) mode
-                        (length frequency) frequency
-                        (length rstsent) rstsent
-                        (length rstrcvd) rstrcvd
-                        (length operator) operator
-                        (length location) location
-                        (length comment) comment))
-        (forward-line)))
-    (write-file "~/qso-log-export.adi"))))
 
 (provide 'qso)
 ;;; qso.el ends here
