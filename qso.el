@@ -4,7 +4,7 @@
 
 ;; Author: W6PEN
 ;; Keywords: lisp
-;; Version: 0.7.2
+;; Version: 0.7.3
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -45,8 +45,8 @@
         (rstsent (read-string "RST Sent: "))
         (location (read-string "Location: "))
         (operator (read-string "Operator: "))
-        (comment (read-string "Comment: ")))
-        (timeoff (format-time-string "%H%M" (current-time) t))
+        (comment (read-string "Comment: "))
+        (timeoff (format-time-string "%H%M" (current-time) t)))
     (with-temp-buffer
       (insert (format "Callsign: %s\nDate: %s\nTime On: %s\nTime Off: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
                       callsign date time timeoff mode frequency rstsent rstrcvd operator location comment))
@@ -112,8 +112,8 @@
 		(rstrcvd (read-string "RST Rcvd: "))
 		(location (read-string "Location: "))
 		(operator (read-string "Operator: "))
-		(comment (read-string "Comment: ")))
-		(timeoff (format-time-string "%H%M" (current-time) t))
+		(comment (read-string "Comment: "))
+		(timeoff (format-time-string "%H%M" (current-time) t)))
 	    (with-temp-buffer
 	      (insert (format "Callsign: %s\nDate: %s\nTime On: %s\nTime Off: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
 			      callsign date time timeoff mode frequency rstsent rstrcvd operator location comment))
