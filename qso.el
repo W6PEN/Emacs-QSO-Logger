@@ -4,7 +4,7 @@
 
 ;; Author: W6PEN
 ;; Keywords: lisp
-;; Version: 0.7.4
+;; Version: 0.7.5
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -36,15 +36,15 @@
 (defun qso-add ()
   "Prompt the user for information about a new amateur radio contact (QSO) in real time and append it to the txt and ADIF logbooks."
   (interactive)
-  (let ((frequency (read-string "Frequency (MHz): "))
-        (mode (read-string "Mode: "))
-        (callsign (read-string "Callsign: "))
+  (let ((callsign (read-string "Callsign: "))
         (date (format-time-string "%Y%m%d" (current-time) t))
         (time (format-time-string "%H%M" (current-time) t))
         (rstrcvd (read-string "RST Rcvd: "))
         (rstsent (read-string "RST Sent: "))
         (location (read-string "Location: "))
         (operator (read-string "Operator: "))
+        (frequency (read-string "Frequency (MHz): "))
+        (mode (read-string "Mode: "))
         (comment (read-string "Comment: "))
         (timeoff (format-time-string "%H%M" (current-time) t)))
     (with-temp-buffer
@@ -165,7 +165,312 @@
 			      (length operator) operator
 			      (length location) location
 			      (length comment) comment))
-	      (append-to-file (point-min) (point-max) "~/qso-log.adi"))))))
+	      (append-to-file (point-min) (point-max) "~/qso-log.adi"))))))(defgroup QSO-Logger nil
+  "QSO Logger Settings")
+
+(defcustom qso-textfile-path "~/qso-log.txt"
+  "Path to QSO TXT File"
+  :type 'string
+  :group 'QSO-Logger)
+
+(defcustom qso-adif-path "~/qso-log.adi"
+  "Path to QSO ADIF File"
+  :type 'string
+  :group 'QSO-Logger)
+
+(defcustom qso-operator "YOURID"
+  "Your Callsign for the log"
+  :type 'string
+  :group 'QSO-Logger)
+
+(defun qso-add ()
+  "Prompt the user for information about a new amateur radio contact (QSO) in real time and append it to the txt and ADIF logbooks."
+  (interactive)
+  (let ((callsign (read-string "Callsign: "))
+        (date (format-time-string "%Y%m%d" (current-time) t))
+        (time (format-time-string "%H%M" (current-time) t))
+        (rstrcvd (read-string "RST Rcvd: "))
+        (rstsent (read-string "RST Sent: "))
+        (location (read-string "Location: "))
+        (operator (read-string "Operator: "))
+        (frequency (read-string "Frequency (MHz): "))
+        (mode (read-string "Mode: "))
+        (comment (read-string "Comment: "))
+        (timeoff (format-time-string "%H%M" (current-time) t)))
+    (with-temp-buffer
+      (insert (format "Callsign: %s\nDate: %s\nTime On: %s\nTime Off: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
+                      callsign date time timeoff mode frequency rstsent rstrcvd operator location comment))
+      (append-to-file (point-min) (point-max) qso-textfile-path))
+    (with-temp-buffer    
+      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<TIME_OFF:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
+                        (length callsign) callsign
+                        (length date) date
+                        (length time) time
+                        (length timeoff) timeoff
+                        (length mode) mode
+                        (length frequency) frequency
+                        (length rstsent) rstsent
+                        (length rstrcvd) rstrcvd
+                        (length operator) operator
+                        (length location) location
+                        (length comment) comment))
+      (append-to-file (point-min) (point-max) qso-adif-path))))
+
+(defun qso-add-previous ()
+  "Prompt the user for information about a previous amateur radio contact (QSO) and append it to the txt and ADIF logbooks."
+  (interactive)
+  (let ((frequency (read-string "Frequency (MHz): "))
+        (mode (read-string "Mode: "))
+        (callsign (read-string "Callsign: "))
+        (date (read-string "QSO UTC Date (YYYYMMDD): "))
+        (time (read-string "QSO UTC Time (HHMMSS): "))
+        (timeoff (read-string "QSO UTC Time Off (HHMM): "))
+        (rstrcvd (read-string "RST Rcvd: "))
+        (rstsent (read-string "RST Sent: "))
+        (location (read-string "Location: "))
+        (operator (read-string "Operator: "))
+        (comment (read-string "Comment: ")))
+    (with-temp-buffer
+      (insert (format "Callsign: %s\nDate: %s\nTime: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
+                      callsign date time mode frequency rstsent rstrcvd operator location comment))
+      (append-to-file (point-min) (point-max) qso-textfile-path))
+    (with-temp-buffer    
+      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
+                        (length callsign) callsign
+                        (length date) date
+                        (length time) time
+                        (length timeoff) timeoff
+                        (length mode) mode
+                        (length frequency) frequency
+                        (length rstsent) rstsent
+                        (length rstrcvd) rstrcvd
+                        (length operator) operator
+                        (length location) location
+                        (length comment) comment))
+      (append-to-file (point-min) (point-max) qso-adif-path))))
+
+(defun qso-add-multi ()
+  "Prompt the user for information about amateur radio contacts responding to your CQ in real time and add them to the txt and ADIF logbooks."
+  (interactive)
+  (let ((frequency (read-string "Frequency (MHz): "))
+        (mode (read-string "Mode: ")))
+	(while (eq 1 1)
+	  (let ((callsign (read-string "Callsign: "))
+		(date (format-time-string "%Y%m%d" (current-time) t))
+		(time (format-time-string "%H%M" (current-time) t))
+		(rstsent (read-string "RST Sent: "))
+		(rstrcvd (read-string "RST Rcvd: "))
+		(location (read-string "Location: "))
+		(operator (read-string "Operator: "))
+		(comment (read-string "Comment: "))
+		(timeoff (format-time-string "%H%M" (current-time) t)))
+	    (with-temp-buffer
+	      (insert (format "Callsign: %s\nDate: %s\nTime On: %s\nTime Off: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
+			      callsign date time timeoff mode frequency rstsent rstrcvd operator location comment))
+	      (append-to-file (point-min) (point-max) qso-textfile-path))
+	    (with-temp-buffer    
+	      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<TIME_OFF:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
+			      (length callsign) callsign
+			      (length date) date
+			      (length time) time
+			      (length timeoff) timeoff
+			      (length mode) mode
+			      (length frequency) frequency
+			      (length rstsent) rstsent
+			      (length rstrcvd) rstrcvd
+			      (length operator) operator
+			      (length location) location
+			      (length comment) comment))
+	      (append-to-file (point-min) (point-max) qso-adif-path))))))
+
+(defun qso-add-multi-previous ()
+  "Prompt the user for information about previous amateur radio contacts responding to your CQ and add them to the txt and ADIF logbooks."
+  (interactive)
+  (let ((frequency (read-string "Frequency (MHz): "))
+        (mode (read-string "Mode: ")))
+	(while (eq 1 1)
+	  (let ((callsign (read-string "Callsign: "))
+		(date (read-string "QSO UTC Date (YYYYMMDD): "))
+		(time (read-string "QSO UTC Time (HHMMSS): "))
+	        (timeoff (read-string "QSO UTC Time Off (HHMM): "))
+		(rstsent (read-string "RST Sent: "))
+		(rstrcvd (read-string "RST Rcvd: "))
+		(location (read-string "Location: "))
+		(operator (read-string "Operator: "))
+		(comment (read-string "Comment: ")))
+	    (with-temp-buffer
+	      (insert (format "Callsign: %s\nDate: %s\nTime: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nOperator: %s\nLocation: %s\nComment: %s\n\n"
+			      callsign date time mode frequency rstsent rstrcvd operator location comment))
+	      (append-to-file (point-min) (point-max) qso-textfile-path))
+	    (with-temp-buffer    
+	      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<eor>\n"
+			      (length callsign) callsign
+			      (length date) date
+			      (length time) time
+			      (length timeoff) timeoff
+			      (length mode) mode
+			      (length frequency) frequency
+			      (length rstsent) rstsent
+			      (length rstrcvd) rstrcvd
+			      (length operator) operator
+			      (length location) location
+			      (length comment) comment))
+	      (append-to-file (point-min) (point-max) qso-adif-path))))))
+(defgroup QSO-Logger nil
+  "QSO Logger Settings")
+
+(defcustom qso-textfile-path "~/qso-log.txt"
+  "Path to QSO TXT File"
+  :type 'string
+  :group 'QSO-Logger)
+
+(defcustom qso-adif-path "~/qso-log.adi"
+  "Path to QSO ADIF File"
+  :type 'string
+  :group 'QSO-Logger)
+
+(defcustom qso-operator "MYCALL"
+  "Your Callsign for log entries"
+  :type 'string
+  :group 'QSO-Logger)
+
+(defun qso-add ()
+  "Prompt the user for information about a new amateur radio contact (QSO) in real time and append it to the txt and ADIF logbooks"
+  (interactive)
+  (let ((callsign (read-string "Callsign: "))
+        (date (format-time-string "%Y%m%d" (current-time) t))
+        (time (format-time-string "%H%M" (current-time) t))
+        (rstrcvd (read-string "RST Rcvd: "))
+        (rstsent (read-string "RST Sent: "))
+        (location (read-string "QTH: "))
+        (operator (read-string "Name: "))
+        (frequency (read-string "Frequency (MHz): "))
+        (mode (read-string "Mode: "))
+        (comment (read-string "Comment: "))
+        (timeoff (format-time-string "%H%M" (current-time) t)))
+    (with-temp-buffer
+      (insert (format "Callsign: %s\nDate: %s\nTime On: %s\nTime Off: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nName: %s\nQTH: %s\nComment: %s\nDE: %s\n\n"
+                      callsign date time timeoff mode frequency rstsent rstrcvd operator location comment qso-operator))
+      (append-to-file (point-min) (point-max) qso-textfile-path))
+    (with-temp-buffer    
+      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<TIME_OFF:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<OPERATOR:%d>%s<eor>\n"
+                        (length callsign) callsign
+                        (length date) date
+                        (length time) time
+                        (length timeoff) timeoff
+                        (length mode) mode
+                        (length frequency) frequency
+                        (length rstsent) rstsent
+                        (length rstrcvd) rstrcvd
+                        (length operator) operator
+                        (length location) location
+                        (length comment) comment
+			(length qso-operator) qso-operator))
+      (append-to-file (point-min) (point-max) qso-adif-path))))
+
+(defun qso-add-previous ()
+  "Prompt the user for information about a previous amateur radio contact (QSO) and append it to the txt and ADIF logbooks."
+  (interactive)
+  (let ((frequency (read-string "Frequency (MHz): "))
+        (mode (read-string "Mode: "))
+        (callsign (read-string "Callsign: "))
+        (date (read-string "QSO UTC Date (YYYYMMDD): "))
+        (time (read-string "QSO UTC Time (HHMMSS): "))
+        (timeoff (read-string "QSO UTC Time Off (HHMM): "))
+        (rstrcvd (read-string "RST Rcvd: "))
+        (rstsent (read-string "RST Sent: "))
+        (operator (read-string "Name: "))
+        (location (read-string "QTH: "))
+        (comment (read-string "Comment: ")))
+    (with-temp-buffer
+      (insert (format "Callsign: %s\nDate: %s\nTime: %s\nTime Off: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nName: %s\nQTH: %s\nComment: %s\nDE: %s\n\n"
+                      callsign date time timeoff mode frequency rstsent rstrcvd operator location comment qso-operator))
+      (append-to-file (point-min) (point-max) qso-textfile-path))
+    (with-temp-buffer    
+      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<TIME_OFF:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<OPERATOR:%d>%s<eor>\n"
+                        (length callsign) callsign
+                        (length date) date
+                        (length time) time
+                        (length timeoff) timeoff
+                        (length mode) mode
+                        (length frequency) frequency
+                        (length rstsent) rstsent
+                        (length rstrcvd) rstrcvd
+                        (length operator) operator
+                        (length location) location
+                        (length comment) comment
+			(length qso-operator) qso-operator))
+      (append-to-file (point-min) (point-max) qso-adif-path))))
+
+(defun qso-add-multi ()
+  "Prompt the user for information about amateur radio contacts responding to your CQ in real time and add them to the txt and ADIF logbooks."
+  (interactive)
+  (let ((frequency (read-string "Frequency (MHz): "))
+        (mode (read-string "Mode: ")))
+	(while (eq 1 1)
+	  (let ((callsign (read-string "Callsign: "))
+		(date (format-time-string "%Y%m%d" (current-time) t))
+		(time (format-time-string "%H%M" (current-time) t))
+		(rstsent (read-string "RST Sent: "))
+		(rstrcvd (read-string "RST Rcvd: "))
+		(location (read-string "QTH: "))
+		(operator (read-string "Name: "))
+		(comment (read-string "Comment: "))
+		(timeoff (format-time-string "%H%M" (current-time) t)))
+	    (with-temp-buffer
+	      (insert (format "Callsign: %s\nDate: %s\nTime On: %s\nTime Off: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nName: %s\nQTH: %s\nComment: %s\nDE: %s\n\n"
+			      callsign date time timeoff mode frequency rstsent rstrcvd operator location comment qso-operator))
+	      (append-to-file (point-min) (point-max) qso-textfile-path))
+	    (with-temp-buffer    
+	      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<TIME_OFF:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<OPERATOR:%d>%s<eor>\n"
+			      (length callsign) callsign
+			      (length date) date
+			      (length time) time
+			      (length timeoff) timeoff
+			      (length mode) mode
+			      (length frequency) frequency
+			      (length rstsent) rstsent
+			      (length rstrcvd) rstrcvd
+			      (length operator) operator
+			      (length location) location
+			      (length comment) comment
+  			      (length qso-operator) qso-operator))
+	      (append-to-file (point-min) (point-max) qso-adif-path))))))
+
+(defun qso-add-multi-previous ()
+  "Prompt the user for information about previous amateur radio contacts responding to your CQ and add them to the txt and ADIF logbooks."
+  (interactive)
+  (let ((frequency (read-string "Frequency (MHz): "))
+        (mode (read-string "Mode: ")))
+	(while (eq 1 1)
+	  (let ((callsign (read-string "Callsign: "))
+		(date (read-string "QSO UTC Date (YYYYMMDD): "))
+		(time (read-string "QSO UTC Time (HHMMSS): "))
+	        (timeoff (read-string "QSO UTC Time Off (HHMM): "))
+		(rstsent (read-string "RST Sent: "))
+		(rstrcvd (read-string "RST Rcvd: "))
+		(location (read-string "QTH: "))
+		(operator (read-string "Name: "))
+		(comment (read-string "Comment: ")))
+	    (with-temp-buffer
+	      (insert (format "Callsign: %s\nDate: %s\nTime: %s\nTime Off: %s\nMode: %s\nFrequency: %s\nRST Sent: %s\nRST Rcvd: %s\nName: %s\nQTH: %s\nComment: %s\nDE: %s\n\n"
+			      callsign date time timeoff mode frequency rstsent rstrcvd operator location comment qso-operator))
+	      (append-to-file (point-min) (point-max) qso-textfile-path))
+	    (with-temp-buffer    
+	      (insert (format "<CALL:%d>%s<QSO_DATE:%d>%s<TIME_ON:%d>%s<TIME_OFF:%d>%s<MODE:%d>%s<FREQ:%d>%s<RST_SENT:%d>%s<RST_RCVD:%d>%s<NAME:%d>%s<QTH:%d>%s<COMMENT:%d>%s<OPERATOR:%d>%s<eor>\n"
+			      (length callsign) callsign
+			      (length date) date
+			      (length time) time
+			      (length timeoff) timeoff
+			      (length mode) mode
+			      (length frequency) frequency
+			      (length rstsent) rstsent
+			      (length rstrcvd) rstrcvd
+			      (length operator) operator
+			      (length location) location
+			      (length comment) comment
+			      (length qso-operator) qso-operator))
+	      (append-to-file (point-min) (point-max) qso-adif-path))))))
 
 (provide 'qso)
 ;;; qso.el ends here
