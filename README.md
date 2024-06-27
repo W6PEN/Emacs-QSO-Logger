@@ -7,7 +7,7 @@ qso-logger group, whose parent is the Emacs "Applications" group, accessed with 
 
 Further processing of the logs can be done within Emacs or by importing the ADIF file into another logging program.  
 
-## Installation
+## Manual Installation
 1) Place qsologger.el in the load path. If one hasn't been established, you can place it in `~/.emacs.d/lisp/` and
    then, in the init.el file (located in ~/.emacs.d/) add: `(add-to-list 'load-path "~/.emacs.d/lisp/")`
 2) Add to the init.el file: `(require 'qsologger)`
