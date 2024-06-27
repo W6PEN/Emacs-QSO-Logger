@@ -1,10 +1,10 @@
-;; qsologger.el --- Customizable, Dynamic QSO Logger  -*- lexical-binding: t; -*-
+;;; qsologger.el --- Customizable, Dynamic QSO Logger  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024
+;; Copyright (C) 2024, W6PEN
 
 ;; Author: W6PEN
 ;; Keywords: lisp
-;; Version: 0.8
+;; Version: 0.8.3
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -22,31 +22,24 @@
 (require 'wid-edit)
 (require 'cl-lib)
 
-(defgroup QSO-Logger nil
-  "QSO Logger Settings"
-    :group 'applications)
-
-(defcustom qso-textfile-path "~/qso-log.txt"
-  "Path to QSO TXT File"
-  :type 'string
-  :group 'QSO-Logger)
+(defgroup qso-logger nil
+  "QSO Logger"
+  :tag "QSO Logger"
+  :group 'applications)
 
 (defcustom qso-adif-path "~/qso-log.adi"
   "Path to QSO ADIF File"
+  :tag "QSO ADIF Path"
   :type 'string
-  :group 'QSO-Logger)
+  :group 'qso-logger)
 
 (defcustom OPERATOR "MYCALL"
   "Operator's Callsign"
   :type 'string
-  :group 'QSO-Logger)
-
-;; ADIF 3.1.4 Fields
-;; (defvar *adif-qso-fields* '("ADDRESS" "ADDRESS_INTL" "AGE" "ALTITUDE" "ANT_AZ" "ANT_EL" "ANT_PATH" "ARRL_SECT" " AWARD_GRANTED" "AWARD_SUBMITTED" "A_INDEX" "BAND" "BAND_RX" "CALL" "CHECK" "CLASS" "CLUBLOG_QSO_UPLOAD_DATE" "CLUBLOG_QSO_UPLOAD_STATUS" "CNTY" "COMMENT" "COMMENT_INTL" "CONT" "CONTACTED_OP" "CONTEST_ID" "COUNTRY" "COUNTRY_INTL" "CQZ" "CREDIT_SUBMITTED" "CREDIT_GRANTED" "DARC_DOK" "DISTANCE" "DXCC" "EMAIL" "EQ_CALL" "EQSL_QSLRDATE" "EQSL_QSLSDATE" "EQSL_QSL_RCVD" "EQSL_QSL_SENT" "FISTS" "FISTS_CC" "FORCE_INIT" "FREQ" "FREQ_RX" "GRIDSQUARE" "GRIDSQUARE_EXT" "GUEST_OP" "HAMLOGEU_QSO_UPLOAD_DATE" "HAMLOGEU_QSO_UPLOAD_STATUS" "HAMQTH_QSO_UPLOAD_DATE" "HAMQTH_QSO_UPLOAD_STATUS" "HRDLOG_QSO_UPLOAD_DATE" "HRDLOG_QSO_UPLOAD_STATUS" "IOTA" "IOTA_ISLAND_ID" "ITUZ" "K_INDEX" "LAT" "LON" "LOTW_QSLRDATE" "LOTW_QSLSDATE" "LOTW_QSL_RCVD" "LOTW_QSL_SENT" "MAX_BURSTS" "MODE" "MS_SHOWER" "MY_ALTITUDE" "MY_ANTENNA" "MY_ANTENNA" "MY_ARRL_SECT" "MY_CITY" "MY_CITY_INTL" "MY_CNTY" "MY_COUNTRY" "MY_COUNTRY_INTL" "MY_CQ_ZONE" "MY_DXCC" "MY_FISTS" "MY_GRIDSQUARE" "MY_GRIDSQUARE_EXT" "MY_IOTA" "MY_IOTA_ISLAND_ID" "MY_ITU_ZONE" "MY_LAT" "MY_LON" "MY_NAME" "MY_NAME_INTL" "MY_POSTAL_CODE" "MY_POSTAL_CODE_INTL" "MY_POTA_REF" "MY_RIG" "MY_RIG_INTL" "MY_SIG" "MY_SIG_INTL" "MY_SIG_INFO" "MY_SIG_INFO_INTL" "MY_SOTA_REF" "MY_STATE" "MY_STREET" "MY_STREET_INTL" "MY_USACA_COUNTIES" "MY_VUCC_GRIDS" "MY_WWFF_REF" "NAME" "NAME_INTL" "NOTES" "NOTES_INTL" "NR_BURSTS" "NR_PINGS" "OPERATOR" "OWNER_CALLSIGN" "PFX" "POTA_REF" "PRECEDENCE" "PROP_MODE" "PUBLIC_KEY" "QRZCOM_QSO_UPLOAD_DATE" "QRZCOM_QSO_UPLOAD_STATUS" "QSLMSG" "QSLMSG_INTL" "QSLRDATE" "QSLSDATE" "QSL_RCVD" "QSL_RCVD_VIA" "QSL_SENT" "QSL_SENT_VIA" "QSL_VIA" "QSO_COMPLETE" "QSO_DATE" "QSO_DATE_OFF" "QSO_RANDOM" "QTH" "QTH_INTL" "REGION" "RIG" "RIG_INTL" "RST_RCVD" "RST_SENT" "RX_PWR" "SAT_MODE" "SAT_NAME" "SFI" "SIG" "SIG_INTL" "SIG_INFO" "SIG_INFO_INTL" "SILENT_KEY" "SKCC" "SOTA_REF" "SRX" "SRX_STRING" "STATE" "STATION_CALLSIGN" "STX" "STX_STRING" "SUBMODE" "SWL" "TEN_TEN" "TIME_OFF" "TIME_ON" "TX_PWR" "UKSMG" "USACA_COUNTIES" "VE_PROV" "VUCC_GRIDS" "WEB" "WWFF_REF"))
+  :group 'qso-logger)
 
 (defcustom qso-form-fields
-  '((OPERATOR . nil)
-    (CALL . t)
+  '((CALL . t)
     (NAME . t)
     (RST_RCVD . t)
     (RST_SENT . nil)
@@ -55,6 +48,7 @@
     (NOTES . t))
   "Fields to be shown in the QSO Log Entry form and whether they should be cleared after submission.
 Each entry is a cons cell where the car is the field name and the cdr is a boolean indicating if the field should be cleared after submission."
+  :tag "QSO Form Fields"
   :type '(alist :key-type (choice (const :tag "ADDRESS" ADDRESS)
 				  (const :tag "ADDRESS_INTL" ADDRESS_INTL)
 				  (const :tag "AGE" AGE)
@@ -163,7 +157,7 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
 				  (const :tag "NOTES_INTL" NOTES_INTL)
 				  (const :tag "NR_BURSTS" NR_BURSTS)
 				  (const :tag "NR_PINGS" NR_PINGS)
-				  (const :tag "OPERATOR" OPERATOR)
+;				  (const :tag "OPERATOR" OPERATOR)
 				  (const :tag "OWNER_CALLSIGN" OWNER_CALLSIGN)
 				  (const :tag "PFX" PFX)
 				  (const :tag "POTA_REF" POTA_REF)
@@ -182,7 +176,7 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
 				  (const :tag "QSL_SENT_VIA" QSL_SENT_VIA)
 				  (const :tag "QSL_VIA" QSL_VIA)
 				  (const :tag "QSO_COMPLETE" QSO_COMPLETE)
-				  (const :tag "QSO_DATE" QSO_DATE)
+;				  (const :tag "QSO_DATE" QSO_DATE)
 				  (const :tag "QSO_DATE_OFF" QSO_DATE_OFF)
 				  (const :tag "QSO_RANDOM" QSO_RANDOM)
 				  (const :tag "QTH" QTH)
@@ -213,7 +207,7 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
 				  (const :tag "SWL" SWL)
 				  (const :tag "TEN_TEN" TEN_TEN)
 				  (const :tag "TIME_OFF" TIME_OFF)
-				  (const :tag "TIME_ON" TIME_ON)
+;				  (const :tag "TIME_ON" TIME_ON)
 				  (const :tag "TX_PWR" TX_PWR)
 				  (const :tag "UKSMG" UKSMG)
 				  (const :tag "USACA_COUNTIES" USACA_COUNTIES)
@@ -223,7 +217,7 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
 				  (const :tag "WWFF_REF" WWFF_REF)
                                   (const :tag "Custom Choice" custom-choice))
                 :value-type (boolean :tag "Clear after submission"))
-  :group 'QSO-Logger)
+  :group 'qso-logger)
 
 (defvar qso-form-field-definitions
   '((ADDRESS . (editable-field :format "ADDRESS: %v\n" :size 40 :value ""))
@@ -239,7 +233,7 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
     (A_INDEX . (editable-field :format "A_INDEX: %v\n" :size 40 :value ""))
     (BAND . (editable-field :format "BAND: %v\n" :size 40 :value ""))
     (BAND_RX . (editable-field :format "BAND_RX: %v\n" :size 40 :value ""))
-    (CALL . (editable-field :format "CALL: %v\n" :size 40 :value ""))
+    (CALL . (editable-field :format "CALL: %v\n" :size 10 :value ""))
     (CHECK . (editable-field :format "CHECK: %v\n" :size 40 :value ""))
     (CLASS . (editable-field :format "CLASS: %v\n" :size 40 :value ""))
     (CLUBLOG_QSO_UPLOAD_DATE . (editable-field :format "CLUBLOG_QSO_UPLOAD_DATE: %v\n" :size 40 :value ""))
@@ -267,7 +261,7 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
     (FISTS . (editable-field :format "FISTS: %v\n" :size 40 :value ""))
     (FISTS_CC . (editable-field :format "FISTS_CC: %v\n" :size 40 :value ""))
     (FORCE_INIT . (editable-field :format "FORCE_INIT: %v\n" :size 40 :value ""))
-    (FREQ . (editable-field :format "FREQ: %v\n" :size 40 :value ""))
+    (FREQ . (editable-field :format "FREQ: %v\n" :size 10 :value ""))
     (FREQ_RX . (editable-field :format "FREQ_RX: %v\n" :size 40 :value ""))
     (GRIDSQUARE . (editable-field :format "GRIDSQUARE: %v\n" :size 40 :value ""))
     (GRIDSQUARE_EXT . (editable-field :format "GRIDSQUARE_EXT: %v\n" :size 40 :value ""))
@@ -291,54 +285,53 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
     (MAX_BURSTS . (editable-field :format "MAX_BURSTS: %v\n" :size 40 :value ""))
     (MODE . (menu-choice :tag "MODE" :format "MODE: %[%v%]" :value "SSB"
 			  (item :tag "AM" :value "AM")
-;			  (item :tag "ARDOP" :value "ARDOP")
+			  (item :tag "ARDOP" :value "ARDOP")
 			  (item :tag "ATV" :value "ATV")
 			  (item :tag "CHIP" :value "CHIP")
-;			  (item :tag "CLO" :value "CLO")
-;			  (item :tag "CONTESTI" :value "CONTESTI")
+			  (item :tag "CLO" :value "CLO")
+			  (item :tag "CONTESTI" :value "CONTESTI")
 			  (item :tag "CW" :value "CW")
 			  (item :tag "DIGITALVOICE" :value "DIGITALVOICE")
-;			  (item :tag "DOMINO" :value "DOMINO")
+			  (item :tag "DOMINO" :value "DOMINO")
 			  (item :tag "DYNAMIC" :value "DYNAMIC")
 			  (item :tag "FAX" :value "FAX")
 			  (item :tag "FM" :value "FM")
-;			  (item :tag "FSK441" :value "FSK441")
-;			  (item :tag "FT8" :value "FT8")
-;			  (item :tag "HELL" :value "HELL")
-;			  (item :tag "ISCAT" :value "ISCAT")
-;			  (item :tag "JT4" :value "JT4")
-;			  (item :tag "JT6M" :value "JT6M")
-;			  (item :tag "JT9" :value "JT9")
-;			  (item :tag "JT44" :value "JT44")
-;			  (item :tag "JT65" :value "JT65")
-;			  (item :tag "MFSK" :value "MFSK")
-;			  (item :tag "MSK144" :value "MSK144")
-;			  (item :tag "MT63" :value "MT63")
-;			  (item :tag "OLIVIA" :value "OLIVIA")
-;			  (item :tag "OPERA" :value "OPERA")
+			  (item :tag "FSK441" :value "FSK441")
+			  (item :tag "FT8" :value "FT8")
+			  (item :tag "HELL" :value "HELL")
+			  (item :tag "ISCAT" :value "ISCAT")
+			  (item :tag "JT4" :value "JT4")
+			  (item :tag "JT6M" :value "JT6M")
+			  (item :tag "JT9" :value "JT9")
+			  (item :tag "JT44" :value "JT44")
+			  (item :tag "JT65" :value "JT65")
+			  (item :tag "MFSK" :value "MFSK")
+			  (item :tag "MSK144" :value "MSK144")
+			  (item :tag "MT63" :value "MT63")
+			  (item :tag "OLIVIA" :value "OLIVIA")
+			  (item :tag "OPERA" :value "OPERA")
 			  (item :tag "PAC" :value "PAC")
 			  (item :tag "PAX" :value "PAX")
 			  (item :tag "PKT" :value "PKT")
 			  (item :tag "PSK" :value "PSK")
 			  (item :tag "PSK2K" :value "PSK2K")
-;			  (item :tag "Q15" :value "Q15")
-;			  (item :tag "QRA64" :value "QRA64")
+			  (item :tag "Q15" :value "Q15")
+			  (item :tag "QRA64" :value "QRA64")
 			  (item :tag "ROS" :value "ROS")
 			  (item :tag "RTTY" :value "RTTY")
 			  (item :tag "RTTYM" :value "RTTYM")
 			  (item :tag "SSB" :value "SSB")
 			  (item :tag "SSTV" :value "SSTV")
-;			  (item :tag "T10" :value "T10")
-;			  (item :tag "THOR" :value "THOR")
-;			  (item :tag "THRB" :value "THRB")
-;			  (item :tag "TOR" :value "TOR")
-;			  (item :tag "V4" :value "V4")
-;			  (item :tag "VOI" :value "VOI")
+			  (item :tag "T10" :value "T10")
+			  (item :tag "THOR" :value "THOR")
+			  (item :tag "THRB" :value "THRB")
+			  (item :tag "TOR" :value "TOR")
+			  (item :tag "V4" :value "V4")
+			  (item :tag "VOI" :value "VOI")
 			  (item :tag "WINMOR" :value "WINMOR")
 			  (item :tag "WSPR" :value "WSPR")))
     (MS_SHOWER . (editable-field :format "MS_SHOWER: %v\n" :size 40 :value ""))
     (MY_ALTITUDE . (editable-field :format "MY_ALTITUDE: %v\n" :size 40 :value ""))
-    (MY_ANTENNA . (editable-field :format "MY_ANTENNA: %v\n" :size 40 :value ""))
     (MY_ANTENNA . (editable-field :format "MY_ANTENNA: %v\n" :size 40 :value ""))
     (MY_ARRL_SECT . (editable-field :format "MY_ARRL_SECT: %v\n" :size 40 :value ""))
     (MY_CITY . (editable-field :format "MY_CITY: %v\n" :size 40 :value ""))
@@ -428,8 +421,8 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
     (RIG . (editable-field :format "RIG: %v\n" :size 40
     :value ""))
     (RIG_INTL . (editable-field :format "RIG_INTL: %v\n" :size 40 :value ""))
-    (RST_RCVD . (editable-field :format "RST_RCVD: %v\n" :size 40 :value ""))
-    (RST_SENT . (editable-field :format "RST_SENT: %v\n" :size 40 :value ""))
+    (RST_RCVD . (editable-field :format "RST_RCVD: %v\n" :size 6 :value ""))
+    (RST_SENT . (editable-field :format "RST_SENT: %v\n" :size 6 :value ""))
     (RX_PWR . (editable-field :format "RX_PWR: %v\n" :size 40 :value ""))
     (SAT_MODE . (editable-field :format "SAT_MODE: %v\n" :size 40 :value ""))
     (SAT_NAME . (editable-field :format "SAT_NAME: %v\n" :size 40 :value ""))
@@ -477,8 +470,7 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
   (let ((inhibit-read-only t))
     (erase-buffer))
   (remove-overlays)
-  (widget-insert "Operator: " OPERATOR " \n")
-
+  (widget-insert "OPERATOR: " OPERATOR " \n")
   (let ((widget-alist '()))
     ;; Create widgets for each field and store in widget-alist in the same order
     (dolist (field-info qso-form-fields)
@@ -500,23 +492,25 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
                                         (widget (nth 1 field-pair))
                                         (clear-after-submit (nth 2 field-pair))
                                         (value (widget-value widget)))
-                                   (setq adif-string
-                                         (concat adif-string
-                                                 (format "<%s:%d>%s"
-                                                         (upcase (symbol-name field))
-                                                         (length (format "%s" value))
-                                                         value)))
+				   ;; Generate the adif-string with non-empty field values
+				   (unless (string-empty-p value)
+                                     (setq adif-string
+                                           (concat adif-string
+                                                   (format "<%s:%d>%s"
+                                                           (upcase (symbol-name field))
+                                                           (length (format "%s" value))
+                                                           value))))
                                    ;; Clear the widget if it is marked for clearing
                                    (when clear-after-submit
                                      (widget-value-set widget ""))))
                                ;; Append data to file
                                (with-temp-buffer
-                                 (insert adif-string "<OPERATOR:" 
-					 (format "%d" (length (format "%s" OPERATOR))) ">"
-					 (format "%s" OPERATOR)
-					 "<QSODATE:8>" (format-time-string "%Y%m%d" (current-time) t)
+                                 (insert "<QSODATE:8>" (format-time-string "%Y%m%d" (current-time) t)
 					 "<TIME_ON:6>" (format-time-string "%H%M%S" (current-time) t)
-					 "<eor>\n")
+					 adif-string
+					 "<OPERATOR:" 
+					 (format "%d" (length (format "%s" OPERATOR))) ">"
+					 (format "%s" OPERATOR)"<eor>\n")
                                  (write-region (point-min) (point-max) qso-adif-path t)))
                              (message "QSO logged!"))
                    "Submit")
@@ -529,4 +523,4 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
     (widget-setup)))
 
 (provide 'qsologger)
-;; qsologger.el ends here
+;;; qsologger.el ends here
