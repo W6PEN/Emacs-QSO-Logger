@@ -14,10 +14,10 @@ Further processing of the logs can be done within Emacs or by importing the ADIF
 3) Restart Emacs
 
 ## Getting Started
-1) Execute `M-x customize`, select "Applications" and then select "QSO Logger" to see the customization options
+1) Execute `M-x customize`, select "Applications" and then select "QSO Logger" to see the customization options.
 2) Enter your callsign in the Operator field.
-3) Enter the path to the ADIF file you will be using (e.g. `~/qsolog.adi`)
+3) Enter the path to the ADIF file you will be using (e.g. `~/qsolog.adi`).
 4) Add, remove, or reorder the fields you wish to have on the form.
-5) Select or deselect form fields that you wish you have cleared after a QSO submission (especially helpful for costests)
+5) Select or deselect form fields that you wish you have cleared after a QSO submission (especially helpful for contests).
 6) Click "Apply" or "Apply and Save" as appropriate.
 7) Execute `M-x qso-log-form` to bring up and begin using the log entry form.
