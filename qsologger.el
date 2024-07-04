@@ -4,7 +4,7 @@
 
 ;; Author: W6PEN
 ;; Keywords: lisp
-;; Version: 0.8.4.1
+;; Version: 0.8.5
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -33,6 +33,11 @@
   :type 'string
   :group 'qso-logger)
 
+(defcustom qso-call-duplicates t
+  "Enable duplicate callsign checking"
+  :type 'boolean
+  :group 'qso-logger)
+
 (defcustom OPERATOR "MYCALL"
   "Operator's Callsign"
   :type 'string
@@ -46,7 +51,7 @@
     (FREQ . nil)
     (BAND . nil)
     (MODE . nil)
-    (NOTES . t))
+    (COMMENT . t))
   "Fields to be shown in the QSO Log Entry form and whether they should be cleared after submission.
 Each entry is a cons cell where the car is the field name and the cdr is a boolean indicating if the field should be cleared after submission."
   :tag "QSO Form Fields"
@@ -177,7 +182,7 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
 				  (const :tag "QSL_SENT_VIA" QSL_SENT_VIA)
 				  (const :tag "QSL_VIA" QSL_VIA)
 				  (const :tag "QSO_COMPLETE" QSO_COMPLETE)
-;				  (const :tag "QSO_DATE" QSO_DATE)
+				  (const :tag "QSO_DATE" QSO_DATE)
 				  (const :tag "QSO_DATE_OFF" QSO_DATE_OFF)
 				  (const :tag "QSO_RANDOM" QSO_RANDOM)
 				  (const :tag "QTH" QTH)
@@ -208,7 +213,7 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
 				  (const :tag "SWL" SWL)
 				  (const :tag "TEN_TEN" TEN_TEN)
 				  (const :tag "TIME_OFF" TIME_OFF)
-;				  (const :tag "TIME_ON" TIME_ON)
+				  (const :tag "TIME_ON" TIME_ON)
 				  (const :tag "TX_PWR" TX_PWR)
 				  (const :tag "UKSMG" UKSMG)
 				  (const :tag "USACA_COUNTIES" USACA_COUNTIES)
@@ -695,13 +700,19 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
     (widget-insert "\n")
     (widget-create 'push-button
                    :notify (lambda (&rest _)
-                             (let ((adif-string ""))
+                             (let ((adif-string "")
+				   (call-value nil)
+                                   (date-value "")
+                                   (time-value ""))
                                ;; Collect data from each widget
                                (dolist (field-pair widget-alist)
                                  (let* ((field (nth 0 field-pair))
                                         (widget (nth 1 field-pair))
                                         (clear-after-submit (nth 2 field-pair))
                                         (value (widget-value widget)))
+                                   ;; Store the CALL value for duplicate check
+                                   (when (eq field 'CALL)
+                                     (setq call-value value))
 				   ;; Generate the adif-string with non-empty field values
 				   (unless (string-empty-p value)
                                      (setq adif-string
@@ -710,19 +721,56 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
                                                            (upcase (symbol-name field))
                                                            (length (format "%s" value))
                                                            value))))
+                                   ;; Special handling for QSO_DATE and TIME_ON
+                                   (when (eq field 'QSO_DATE)
+                                     (setq date-value value))
+                                   (when (eq field 'TIME_ON)
+                                     (setq time-value value))
                                    ;; Clear the widget if it is marked for clearing
                                    (when clear-after-submit
                                      (widget-value-set widget ""))))
-                               ;; Append data to file
-                               (with-temp-buffer
-                                 (insert "<QSO_DATE:8>" (format-time-string "%Y%m%d" (current-time) t)
-					 "<TIME_ON:6>" (format-time-string "%H%M%S" (current-time) t)
-					 adif-string
-					 "<OPERATOR:" 
-					 (format "%d" (length (format "%s" OPERATOR))) ">"
-					 (format "%s" OPERATOR)"<eor>\n")
-                                 (write-region (point-min) (point-max) qso-adif-path t)))
-                             (message "QSO logged!"))
+                               ;; Check for duplicate callsign
+                               (let ((duplicate nil)
+                                     (duplicate-data nil))
+                                 (when (and qso-call-duplicates
+                                            call-value
+                                            (not (string-empty-p call-value)))
+				   (with-temp-buffer
+                                     (insert-file-contents qso-adif-path)
+                                     (goto-char (point-max))
+                                     (setq duplicate (re-search-backward (format "<CALL:[0-9]+>%s" (regexp-quote call-value)) nil t))
+                                     (when duplicate
+                                       ;; Capture the most recent duplicate entry
+                                       (let ((start (line-beginning-position))
+                                             (end (line-end-position)))
+                                         (setq duplicate-data (buffer-substring start end))))))
+                                 (if (and duplicate
+                                          (not (y-or-n-p (format "Duplicate: '%s' already exists. Most recent entry:\n%s\nDo you wish to proceed? " call-value duplicate-data))))
+                                     (message "Submission canceled due to duplicate callsign.")
+                                   (progn
+                                     ;; Get the current UTC date and time if date and time fields are empty
+				     (let* ((current-time (current-time))
+                                            (utc-time (format-time-string "%Y%m%d %H%M%S" current-time t))
+                                            (date (substring utc-time 0 8))
+                                            (time (substring utc-time 9 15)))
+                                       (unless (and date-value (not (string-empty-p date-value)))
+					 (setq date-value date))
+                                       (unless (and time-value (not (string-empty-p time-value)))
+					 (setq time-value time))
+                                       ;; Append date and time to the ADIF string
+                                       (setq adif-string
+                                             (concat adif-string
+                                                     (format "<QSO_DATE:8>%s" date-value)
+                                                     (format "<TIME_ON:6>%s" time-value)
+						     "<OPERATOR:" 
+						     (format "%d" (length (format "%s" OPERATOR))) ">"
+						     (format "%s" OPERATOR)"<eor>\n"
+						     ))))
+				   ;; Append data to file
+				   (with-temp-buffer
+                                     (insert adif-string)
+                                     (write-region (point-min) (point-max) qso-adif-path t))
+				   (message "QSO logged!")))))
                    "Submit")
     (widget-insert " ") ;; Add a space between buttons
     (widget-create 'push-button
