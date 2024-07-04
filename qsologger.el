@@ -4,7 +4,7 @@
 
 ;; Author: W6PEN
 ;; Keywords: lisp
-;; Version: 0.8.4
+;; Version: 0.8.4.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -715,7 +715,7 @@ Each entry is a cons cell where the car is the field name and the cdr is a boole
                                      (widget-value-set widget ""))))
                                ;; Append data to file
                                (with-temp-buffer
-                                 (insert "<QSODATE:8>" (format-time-string "%Y%m%d" (current-time) t)
+                                 (insert "<QSO_DATE:8>" (format-time-string "%Y%m%d" (current-time) t)
 					 "<TIME_ON:6>" (format-time-string "%H%M%S" (current-time) t)
 					 adif-string
 					 "<OPERATOR:" 
